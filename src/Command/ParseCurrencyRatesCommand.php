@@ -5,6 +5,8 @@ namespace App\Command;
 use App\Entity\CurrencyRate;
 use App\Services\CurrencyParser\CBRParser;
 use App\Services\CurrencyParser\ECBParser;
+use DateTimeInterface;
+use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -81,12 +83,21 @@ class ParseCurrencyRatesCommand extends Command
         $io->success('Data has successfully imported!');
     }
 
-    private function updateData(array $data, \DateTimeInterface $date, string $source)
+    /**
+     * Update database
+     *
+     * @param array $data
+     * @param DateTimeInterface $date
+     * @param string $source
+     * @throws ConnectionException
+     * @throws Exception
+     */
+    private function updateData(array $data, DateTimeInterface $date, string $source)
     {
         try {
             $this->manager->getConnection()->beginTransaction();
             $this->manager->getRepository(CurrencyRate::class)
-                ->deleteCurrencyRates($date, $source);
+                ->deleteCurrencyRates(clone $date, $source);
 
             foreach ($data as $item) {
                 $currencyRate = new CurrencyRate();
