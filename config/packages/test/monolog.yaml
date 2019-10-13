@@ -5,3 +5,9 @@ monolog:
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
             channels: ["!event"]
+        parser:
+            level: debug
+            type: stream
+            path: '%kernel.logs_dir%/dev/parser.log'
+            channels: [parser]
+    channels: ['parser']

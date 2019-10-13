@@ -10,9 +10,10 @@ bin/console d:s:c
 bin/console app:parse-data [ecb, cbr]  // ecb - default
 ```
 
-Check API:
+## API ##
 ```
 GET: /api/convert
+
 Params:
 from - <string> currency (usd, rub, eur etc.)
 to - <string> currency (usd, rub, eur etc.)
