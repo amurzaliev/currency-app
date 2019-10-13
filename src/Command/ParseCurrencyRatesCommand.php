@@ -2,8 +2,10 @@
 
 namespace App\Command;
 
+use App\Entity\CurrencyRate;
 use App\Services\CurrencyParser\CBRParser;
 use App\Services\CurrencyParser\ECBParser;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -23,12 +25,17 @@ class ParseCurrencyRatesCommand extends Command
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $manager;
 
-    public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
+    public function __construct(ParameterBagInterface $params, LoggerInterface $logger, EntityManagerInterface $manager)
     {
         parent::__construct();
         $this->params = $params;
         $this->logger = $logger;
+        $this->manager = $manager;
     }
 
     protected static $defaultName = 'app:parse-currency-rates';
@@ -64,12 +71,38 @@ class ParseCurrencyRatesCommand extends Command
 
         try {
             $data = $parser->parse();
-            $normalizedData = $parser->normalize($data);
+            $normalizedRates = $parser->normalize($data['rates']);
+            $this->updateData($normalizedRates, $data['date'], $source);
         } catch (Exception $e) {
             $message = $e->getMessage();
             $this->logger->error("[${source}]: ${$message}");
         }
 
         $io->success('Data has successfully imported!');
+    }
+
+    private function updateData(array $data, \DateTimeInterface $date, string $source)
+    {
+        try {
+            $this->manager->getConnection()->beginTransaction();
+            $this->manager->getRepository(CurrencyRate::class)
+                ->deleteCurrencyRates($date, $source);
+
+            foreach ($data as $item) {
+                $currencyRate = new CurrencyRate();
+                $currencyRate
+                    ->setCode($item['code'])
+                    ->setDate($date)
+                    ->setRate($item['rate'])
+                    ->setSource($source);
+                $this->manager->persist($currencyRate);
+            }
+
+            $this->manager->flush();
+            $this->manager->getConnection()->commit();
+        } catch (Exception $e) {
+            $this->manager->getConnection()->rollBack();
+            throw $e;
+        }
     }
 }

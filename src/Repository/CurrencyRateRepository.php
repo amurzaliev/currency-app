@@ -19,32 +19,17 @@ class CurrencyRateRepository extends ServiceEntityRepository
         parent::__construct($registry, CurrencyRate::class);
     }
 
-    // /**
-    //  * @return CurrencyRate[] Returns an array of CurrencyRate objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function deleteCurrencyRates(\DateTimeInterface $date, string $source)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $dql = 'DELETE FROM App\Entity\CurrencyRate c WHERE c.source = :source AND c.date BETWEEN :dateStart AND :dateEnd';
 
-    /*
-    public function findOneBySomeField($value): ?CurrencyRate
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $query = $this->getEntityManager()->createQuery($dql);
+        $query->setParameters([
+            'dateStart' => $date->setTime(0, 0)->format('Y-m-d H:i:s'),
+            'dateEnd'   => $date->setTime(23, 59)->format('Y-m-d H:i:s'),
+            'source'    => $source
+        ]);
+
+        return $query->execute();
     }
-    */
 }

@@ -28,11 +28,10 @@ class ECBParser extends AbstractCurrencyParser
             $result[] = [
                 'code' => $node->attributes[0]->nodeValue,
                 'rate' => (float)str_replace(',', '.', $node->attributes[1]->nodeValue),
-                'date' => $date,
             ];
         }
 
-        return $result;
+        return ['rates' => $result, 'date' => $date];
     }
 
     /**
@@ -64,7 +63,6 @@ class ECBParser extends AbstractCurrencyParser
         $normalizedData[] = [
             'code' => 'EUR',
             'rate' => 1 / $denominator,
-            'date' => $normalizedData[0]['date'],
         ];
 
         return $normalizedData;

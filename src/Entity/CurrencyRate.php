@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CurrencyRateRepository")
+ * @ORM\Table(uniqueConstraints={
+ *          @UniqueConstraint(name="video_unique", columns={"date", "source", "code"})
+ *     })
  */
 class CurrencyRate
 {
@@ -32,10 +36,9 @@ class CurrencyRate
     private $source;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency", inversedBy="currencyRates")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=255)
      */
-    private $currency;
+    private $code;
 
     public function getId(): ?int
     {
@@ -78,14 +81,14 @@ class CurrencyRate
         return $this;
     }
 
-    public function getCurrency(): ?Currency
+    public function getCode(): ?string
     {
-        return $this->currency;
+        return $this->code;
     }
 
-    public function setCurrency(?Currency $currency): self
+    public function setCode(string $code): self
     {
-        $this->currency = $currency;
+        $this->code = $code;
 
         return $this;
     }

@@ -20,7 +20,6 @@ class CBRParser extends AbstractCurrencyParser
     {
         $result = [];
         $crawler = new Crawler(file_get_contents(self::URL));
-        dump($crawler->count());
         $date = new \DateTime($crawler->filterXPath('//ValCurs/@Date')->text());
         $rates = $crawler->filterXPath('//ValCurs/Valute');
 
@@ -29,11 +28,10 @@ class CBRParser extends AbstractCurrencyParser
             $result[] = [
                 'code' => $node->childNodes[1]->nodeValue,
                 'rate' => (float)str_replace(',', '.', $node->childNodes[4]->nodeValue),
-                'date' => $date,
             ];
         }
 
-        return $result;
+        return ['rates' => $result, 'date' => $date];
     }
 
     /**
@@ -65,7 +63,6 @@ class CBRParser extends AbstractCurrencyParser
         $normalizedData[] = [
             'code' => 'RUB',
             'rate' => 1 / $denominator,
-            'date' => $normalizedData[0]['date'],
         ];
 
         return $normalizedData;
