@@ -1,4 +1,4 @@
-## Installation ##
+# Installation #
 1. Configure .env.local
 2. Configure database
 ```
@@ -10,7 +10,7 @@ bin/console d:s:c
 bin/console app:parse-data [ecb, cbr]  // ecb - default
 ```
 
-## API ##
+# API #
 ```
 GET: /api/convert
 
@@ -28,3 +28,6 @@ Response format:
     convertedValue: <float>
 }
 ```
+
+### Warning ###
+The App doesn't use [BC Math](https://www.php.net/manual/en/book.bc.php) or any related libraries for working with float numbers (just demo project).
