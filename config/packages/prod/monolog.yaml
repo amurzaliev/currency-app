@@ -21,3 +21,9 @@ monolog:
             handler: deprecation
             max_level: info
             channels: ["php"]
+        parser:
+            level: debug
+            type: stream
+            path: '%kernel.logs_dir%/prod/parser.log'
+            channels: [parser]
+        channels: ['parser']
